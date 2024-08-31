@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const FileUploader = () => {
+const FileUploader = ({ setFile }) => {
     const [selectedFile, setSelectedFile] = useState(null);
-    const [entityToRedact, setEntityToRedact] = useState("names");
     const [message, setMessage] = useState("");
 
     const onFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
-    };
-
-    const onEntityChange = (event) => {
-        setEntityToRedact(event.target.value);
+        if (event.target.files && event.target.files[0]) {
+            setSelectedFile(event.target.files[0]);
+        } else {
+            setMessage("No file selected.");
+        }
     };
 
     const uploadFile = async () => {
@@ -21,36 +21,33 @@ const FileUploader = () => {
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-        formData.append("entity-type", entityToRedact);
 
-        const response = await fetch('http://localhost:5000/upload', {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const response = await axios.post('http://localhost:5000/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'redacted_output.docx'); // Change extension based on the output file type
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } else {
-            setMessage("Error uploading file.");
+            if (response.data.file_path) {
+                setFile(selectedFile); 
+                setMessage("File uploaded successfully.");
+            } else {
+                setMessage("Error uploading file.");
+            }
+        } catch (error) {
+            setMessage("Error uploading file: " + error.message);
         }
     };
 
     return (
         <div>
-            <input type="file" onChange={onFileChange} />
-            <select value={entityToRedact} onChange={onEntityChange}>
-                <option value="names">Names</option>
-                <option value="phones">Phones</option>
-                <option value="addresses">Addresses</option>
-            </select>
-            <button onClick={uploadFile}>Upload and Redact</button>
+            <input 
+                type="file" 
+                onChange={onFileChange} 
+                accept=".docx, .pdf, .png, .jpg, .jpeg, .mp4, .mov"
+            />
+            <button onClick={uploadFile}>Upload</button>
             <p>{message}</p>
         </div>
     );
