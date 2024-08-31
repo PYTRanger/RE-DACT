@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Hello! How can I assist you today?' }
+    { sender: 'bot', text: 'Hello! Welcome to Re-Dact' }
   ]);
   const [input, setInput] = useState('');
   const [file, setFile] = useState(null);
@@ -93,7 +93,7 @@ function App() {
   return (
     <div className="App">
       <div className="chat-container">
-        <h2>Redact Chatbot</h2>
+        <h2>Redact</h2>
         <FileUploader setFile={setFile} />
         <div className="chat-box">
           {messages.map((msg, index) => (
