@@ -1,14 +1,13 @@
-import os
+from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
+from google.cloud import dialogflow_v2 as dialogflow
+import json
 import logging
 import warnings
+import os
+import io
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
-warnings.filterwarnings("ignore", category=FutureWarning)
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-logging.getLogger("transformers").setLevel(logging.ERROR)
-
+# Import additional packages
 from transformers import pipeline
 from PyPDF2 import PdfReader
 from docx import Document
@@ -16,8 +15,18 @@ import re
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-from transformers import logging as transformers_logging
-transformers_logging.set_verbosity_error()
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+logging.getLogger("transformers").setLevel(logging.ERROR)
+
+app = Flask(__name__)
+CORS(app)
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "redact-names-icmq-29edfc30b1f7.json"
+
+client = dialogflow.SessionsClient()
+project_id = 'redact-names-icmq'
 
 nlp = pipeline("ner", model="dbmdz/bert-large-cased-finetuned-conll03-english", tokenizer="dbmdz/bert-large-cased-finetuned-conll03-english")
 
@@ -42,10 +51,8 @@ def extract_text(file_path):
     
 def extractInfo(text):
     doc = nlp(text)
-    
     names = []
     current_name = []
-    
     for entity in doc:
         if entity['entity'] in ['B-PER', 'I-PER']:
             if entity['word'].startswith("##"):
@@ -59,14 +66,10 @@ def extractInfo(text):
             if current_name:
                 names.append("".join(current_name))
                 current_name = []
-    
     if current_name:
         names.append("".join(current_name))
-
     phones = re.findall(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', text)
-
     addresses = re.findall(r'\d{1,5} \w+ (Street|St|Avenue|Ave|Boulevard|Blvd|Road|Rd|Lane|Ln|Block|Sector)\b', text)
-
     return {
         'names': names,
         'phones': phones,
@@ -91,30 +94,50 @@ def redactedDocx(text, output_path):
 def redactedPdf(text, output_path):
     c = canvas.Canvas(output_path, pagesize=letter)
     text_object = c.beginText(40, 750)  # Starting position
-
     lines = text.split('\n')
     for line in lines:
         text_object.textLine(line)
     c.drawText(text_object)
     c.save()
 
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'message': 'No file part'})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'message': 'No selected file'})
+    if file:
+        file_path = "temp_file" + os.path.splitext(file.filename)[1]
+        file.save(file_path)
+        entity_to_redact = request.form.get('entity-type', 'names')
+
+        try:
+            text = extract_text(file_path)
+            info = extractInfo(text)
+            if entity_to_redact == 'names':
+                info = {'names': info['names'], 'phones': [], 'addresses': []}
+            elif entity_to_redact == 'phones':
+                info = {'names': [], 'phones': info['phones'], 'addresses': []}
+            elif entity_to_redact == 'addresses':
+                info = {'names': [], 'phones': [], 'addresses': info['addresses']}
+            else:
+                pass
+            
+            redacted = redact(text, info)
+            output_path = "redacted_output.docx"
+            if file_path.endswith('.docx'):
+                redactedDocx(redacted, output_path)
+            elif file_path.endswith('.pdf'):
+                output_path = "redacted_output.pdf"
+                redactedPdf(redacted, output_path)
+            else:
+                return jsonify({'message': 'Unsupported file format'})
+            
+            return send_file(output_path, as_attachment=True)
+
+        except Exception as e:
+            return jsonify({'message': f"Error: {str(e)}"})
+
 if __name__ == '__main__':
-    file_path = input('Enter the file path: ')
-    try:
-        text = extract_text(file_path)
-        info = extractInfo(text)
-        redacted = redact(text, info)
-        output = input("Enter the output file path: ")
-        if output.endswith('.docx'):
-            redactedDocx(redacted, output)
-        elif output.endswith('.pdf'):
-            redactedPdf(redacted, output)
-        else:
-            print("Unsupported output format")
-
-        print(f"Redacted file saved as: {output}")
-    except Exception as e:
-        print("Error:", e)
-
-
-
+    app.run(debug=True)
