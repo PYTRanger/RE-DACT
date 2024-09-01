@@ -1,0 +1,36 @@
+.header1 {
+    margin-top: 10px;
+}
+
+.header1 input {
+    margin-left: 5px;
+    background-color: #00224D;  /* Keeps the input's background color red */
+    border-radius: 10px;     /* Adds a border radius for rounded corners */
+    padding: 7px;          /* Adds some padding for better spacing inside the input */
+    border: none;           /* Removes the default border */
+    color: white;           /* Sets the text color to white for better contrast */
+    font-size: 12px;        /* Adjusts the font size */
+}
+
+.header1 select {
+    border-radius: 10px;     /* Adds border radius to the select element as well */
+    padding: 7px;
+    margin-left: 5px;  
+    color: white;
+    background-color: #00224D;     /* Adds some spacing between input and select */
+}
+
+.header1 button {
+    border-radius: 10px;     /* Adds border radius to the button */
+    padding: 8px;     /* Adds padding for better appearance */
+    background-color: #00224D; /* Sets a different background color for the button */
+    color: white;           /* Sets the text color to white */
+    margin-left: 5px;       /* Adds some spacing between select and button */
+    border: none;           /* Removes the default border */
+    cursor: pointer;        /* Changes cursor to pointer on hover */
+}
+
+.header1 p {
+    margin-top: 10px;       /* Adds some margin to the top of the paragraph */
+    color: green;           /* Sets a color for the message text */
+}

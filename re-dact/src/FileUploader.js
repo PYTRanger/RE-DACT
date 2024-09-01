@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import './FileUploader.css';
 const FileUploader = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [entityToRedact, setEntityToRedact] = useState("names");
@@ -43,7 +43,8 @@ const FileUploader = () => {
     };
 
     return (
-        <div>
+        <div className='header1'>
+
             <input type="file" onChange={onFileChange} />
             <select value={entityToRedact} onChange={onEntityChange}>
                 <option value="names">Names</option>

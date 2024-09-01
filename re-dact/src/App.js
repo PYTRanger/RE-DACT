@@ -42,7 +42,7 @@ function App() {
   return (
     <div className="App">
       <div className="chat-container">
-        <h2>Redact Chatbot</h2>
+        <h2>RE-DACT Chatbot</h2>
         <FileUploader />
         <div className="chat-box">
           {messages.map((msg, index) => (
