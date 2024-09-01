@@ -4,33 +4,51 @@
 
 .header1 input {
     margin-left: 5px;
-    background-color: #00224D;  /* Keeps the input's background color red */
-    border-radius: 10px;     /* Adds a border radius for rounded corners */
-    padding: 7px;          /* Adds some padding for better spacing inside the input */
-    border: none;           /* Removes the default border */
-    color: white;           /* Sets the text color to white for better contrast */
-    font-size: 12px;        /* Adjusts the font size */
+    background-color: #00224D;
+    border-radius: 10px;    
+    padding: 7px;         
+    border: none;           
+    color: white;          
+    font-size: 12px;       
 }
 
 .header1 select {
-    border-radius: 10px;     /* Adds border radius to the select element as well */
+    border-radius: 10px;     
     padding: 7px;
     margin-left: 5px;  
     color: white;
-    background-color: #00224D;     /* Adds some spacing between input and select */
+    background-color: #00224D;    
 }
 
 .header1 button {
-    border-radius: 10px;     /* Adds border radius to the button */
-    padding: 8px;     /* Adds padding for better appearance */
-    background-color: #00224D; /* Sets a different background color for the button */
-    color: white;           /* Sets the text color to white */
-    margin-left: 5px;       /* Adds some spacing between select and button */
-    border: none;           /* Removes the default border */
-    cursor: pointer;        /* Changes cursor to pointer on hover */
+    border-radius: 10px;     
+    padding: 8px;     
+    background-color: #00224D; 
+    color: white;          
+    margin-left: 5px;      
+    border: none;          
+    cursor: pointer;        
 }
 
 .header1 p {
-    margin-top: 10px;       /* Adds some margin to the top of the paragraph */
-    color: green;           /* Sets a color for the message text */
+    margin-top: 10px;       
+    color: green;         
+}
+
+.upload-button {
+    background-color: #4CAF50; 
+    border: none;
+    color: white;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 40px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.upload-button:hover {
+    background-color: #45a049;
 }
