@@ -18,10 +18,11 @@
 
 .chat-container h2 {
   text-align: center;
-  height: 35px;
+  height: 50px;
+  text-transform: uppercase;
+  text-size-adjust: 24px ;
   background-color: #1F316F;
   color: white;
-  
   margin: 0;
   padding: 10px;
   border-top-left-radius: 8px;
@@ -66,7 +67,7 @@
   flex: 1;
   padding: 10px;
   border: none;
-  height: 45px;
+  height: 50px;
   border-bottom-left-radius: 8px;
 }
 

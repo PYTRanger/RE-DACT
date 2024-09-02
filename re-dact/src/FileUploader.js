@@ -42,8 +42,9 @@ const FileUploader = ({ setFile }) => {
     };
 
     return (
-        <div>
+        <div className='x1'>
             <input 
+
                 type="file" 
                 onChange={onFileChange} 
                 accept=".docx, .pdf, .png, .jpg, .jpeg, .mp4, .mov"
